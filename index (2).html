@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toko Skincare - Welcome</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        body { background-color: #e0f2fe; font-family: 'Segoe UI', sans-serif; }
+        .mobile-container { max-width: 400px; margin: 0 auto; background: white; min-height: 100vh; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+        .sky-btn { background-color: #0ea5e9; transition: transform 0.2s; }
+        .sky-btn:active { transform: scale(0.95); }
+        .product-card img { height: 120px; object-fit: cover; border-radius: 10px; }
+        .hidden-section { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="mobile-container p-6">
+    <div id="auth-section" class="animate__animated animate__fadeIn">
+        <h2 class="text-2xl font-bold text-sky-600 mb-2">Daftar Akun</h2>
+        <p class="text-sm text-gray-500 mb-6">Owner: Sri Astuti</p>
+        
+        <div class="space-y-4">
+            <input type="text" placeholder="Nama Lengkap" class="w-full p-3 border rounded-xl outline-none focus:border-sky-500">
+            <input type="email" placeholder="Email" class="w-full p-3 border rounded-xl outline-none focus:border-sky-500">
+            <input type="password" id="pass" placeholder="Kunci Akses (Password)" class="w-full p-3 border rounded-xl outline-none focus:border-sky-500">
+            <button onclick="showShop()" class="sky-btn w-full text-white py-3 rounded-xl font-bold shadow-lg">Sign Up & Login</button>
+        </div>
+    </div>
+
+    <div id="shop-section" class="hidden-section animate__animated animate__slideInRight">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-xl font-bold text-sky-700">Toko Skincare</h1>
+            <div class="relative">
+                <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 rounded-full">0</span>
+                <svg onclick="goToCart()" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-sky-600 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div class="product-card p-3 border rounded-2xl bg-sky-50 text-center">
+                <img src="https://images.unsplash.com/photo-1556228720-195a672e8a03?w=200" alt="Serum" class="w-full mb-2">
+                <h3 class="font-bold text-gray-700">Glow Serum</h3>
+                <p class="text-sky-600 text-sm font-bold">Rp 85.000</p>
+                <button onclick="addToCart('Glow Serum', 85000)" class="sky-btn mt-2 text-white text-xs px-4 py-2 rounded-lg w-full">Tambah</button>
+            </div>
+            <div class="product-card p-3 border rounded-2xl bg-sky-50 text-center">
+                <img src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=200" alt="Moist" class="w-full mb-2">
+                <h3 class="font-bold text-gray-700">Hydra Moist</h3>
+                <p class="text-sky-600 text-sm font-bold">Rp 120.000</p>
+                <button onclick="addToCart('Hydra Moist', 120000)" class="sky-btn mt-2 text-white text-xs px-4 py-2 rounded-lg w-full">Tambah</button>
+            </div>
+            <div class="product-card p-3 border rounded-2xl bg-sky-50 text-center">
+                <img src="https://images.unsplash.com/photo-1598440490510-911477264883?w=200" alt="Cleanser" class="w-full mb-2">
+                <h3 class="font-bold text-gray-700">Face Wash</h3>
+                <p class="text-sky-600 text-sm font-bold">Rp 45.000</p>
+                <button onclick="addToCart('Face Wash', 45000)" class="sky-btn mt-2 text-white text-xs px-4 py-2 rounded-lg w-full">Tambah</button>
+            </div>
+            <div class="product-card p-3 border rounded-2xl bg-sky-50 text-center">
+                <img src="https://images.unsplash.com/photo-1594125354139-3f7315ffcc1b?w=200" alt="Sunscreen" class="w-full mb-2">
+                <h3 class="font-bold text-gray-700">Sunscreen</h3>
+                <p class="text-sky-600 text-sm font-bold">Rp 95.000</p>
+                <button onclick="addToCart('Sunscreen', 95000)" class="sky-btn mt-2 text-white text-xs px-4 py-2 rounded-lg w-full">Tambah</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    
+    function showShop() {
+        document.getElementById('auth-section').classList.add('hidden-section');
+        document.getElementById('shop-section').classList.remove('hidden-section');
+        updateCartCount();
+    }
+
+    function addToCart(name, price) {
+        cart.push({ name, price, id: Date.now() });
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartCount();
+        alert(name + " masuk keranjang!");
+    }
+
+    function updateCartCount() {
+        document.getElementById('cart-count').innerText = cart.length;
+    }
+
+    function goToCart() {
+        window.location.href = 'cart.html';
+    }
+</script>
+</body>
+</html>

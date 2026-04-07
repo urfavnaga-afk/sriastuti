@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keranjang - Toko Skincare</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        body { background-color: #e0f2fe; }
+        .mobile-container { max-width: 400px; margin: 0 auto; background: white; min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+        .sky-btn { background-color: #0ea5e9; }
+    </style>
+</head>
+<body>
+
+<div class="mobile-container p-6">
+    <div class="flex items-center mb-6">
+        <button onclick="location.href='index.html'" class="text-sky-600 mr-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+        </button>
+        <h1 class="text-xl font-bold text-sky-700">Keranjang Saya</h1>
+    </div>
+
+    <div id="cart-items" class="space-y-4 mb-8">
+        </div>
+
+    <div id="checkout-form" class="border-t pt-4 space-y-4">
+        <h3 class="font-bold text-gray-700">Data Pengiriman</h3>
+        <textarea id="address" placeholder="Alamat Lengkap Pembeli" class="w-full p-3 border rounded-xl text-sm outline-none focus:border-sky-500"></textarea>
+        
+        <select id="payment" class="w-full p-3 border rounded-xl text-sm outline-none bg-white">
+            <option value="Transfer Bank">Transfer Bank</option>
+            <option value="E-Wallet (OVO/Dana)">E-Wallet (OVO/Dana)</option>
+            <option value="COD">Bayar di Tempat (COD)</option>
+        </select>
+
+        <div class="bg-sky-50 p-4 rounded-xl">
+            <div class="flex justify-between font-bold text-sky-800">
+                <span>Total Bayar:</span>
+                <span id="total-price">Rp 0</span>
+            </div>
+        </div>
+
+        <button onclick="processCheckout()" class="sky-btn w-full text-white py-4 rounded-2xl font-bold shadow-lg mt-4">Konfirmasi Checkout</button>
+    </div>
+</div>
+
+<script>
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    function renderCart() {
+        const container = document.getElementById('cart-items');
+        const totalEl = document.getElementById('total-price');
+        
+        if (cart.length === 0) {
+            container.innerHTML = `<p class="text-center text-gray-400 py-10">Keranjang kosong...</p>`;
+            totalEl.innerText = `Rp 0`;
+            return;
+        }
+
+        let total = 0;
+        container.innerHTML = cart.map((item, index) => {
+            total += item.price;
+            return `
+                <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-sky-100 animate__animated animate__fadeIn">
+                    <div>
+                        <p class="font-bold text-gray-700">${item.name}</p>
+                        <p class="text-xs text-sky-600">Rp ${item.price.toLocaleString()}</p>
+                    </div>
+                    <button onclick="removeItem(${index})" class="text-red-400 hover:text-red-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
+            `;
+        }).join('');
+        
+        totalEl.innerText = `Rp ${total.toLocaleString()}`;
+    }
+
+    function removeItem(index) {
+        cart.splice(index, 1);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        renderCart();
+    }
+
+    function processCheckout() {
+        const addr = document.getElementById('address').value;
+        const pay = document.getElementById('payment').value;
+        const phone = "081914210406";
+
+        if (cart.length === 0) return alert("Keranjang masih kosong!");
+        if (!addr) return alert("Isi alamat pengiriman!");
+
+        // Animasi Confetti
+        confetti({
+            particleCount: 150,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ['#0ea5e9', '#ffffff', '#7dd3fc']
+        });
+
+        setTimeout(() => {
+            const message = `Halo Admin, saya mau pesan:\n\n` + 
+                            cart.map(i => `- ${i.name} (Rp ${i.price})`).join('\n') +
+                            `\n\nAlamat: ${addr}\nBayar via: ${pay}`;
+            
+            const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+            window.open(waUrl, '_blank');
+            
+            // Clear cart
+            localStorage.removeItem('cart');
+            location.href = 'index.html';
+        }, 2000);
+    }
+
+    renderCart();
+</script>
+</body>
+</html>
